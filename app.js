@@ -11,46 +11,17 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 // Array will store number of team member objects
 const team = [];
-
-runInquirer();
-
-// Write code to use inquirer to gather information about the development team members
-function runInquirer() {
-    inquirer
-        .prompt({   
-
-            type: "list",
-            message: "Add a member",
-            name: "memberType",
-            choices: ["Manager", "Engineer", "Intern"]
-            
-        })
-        .then(function(answer) {
-            console.log(answer);
-            if (answer.memberType === "Manager") {
-                addManager();
-            }
-            else if (answer.memberType === "Engineer") {
-                addEngineer();
-            } 
-            else if (answer.memberType === "Intern") {
-                addIntern();
-            }
-        });
-}
-
-// and to create objects for each team member (using the correct classes as blueprints!)
-// adds manager member to team array
-function addManager() {
+// Starts application by adding manager
+function start(){
     inquirer
         .prompt([{
-            type: "input",
-            message: "What is the member's name?",
+            type: "input",           
+            message: "What is the manager's name?",            
             name: "name"
         }, {
             type: "input",
             message: "What is the member's id?",
-            name: "id"
+            name: "id"           
         }, {
             type: "input",
             message: "What is the member's email?",
@@ -61,18 +32,80 @@ function addManager() {
             name: "office"
         }
         ])
-        .then(function(response){
+        .then(function(response) {
             console.log(response);
             const manager = new Manager(response.name, response.id, response.email, response.office);
             team.push(manager);
-            console.log(team);
-            if (team.length < 3) {
-                runInquirer();
-            }
-        });   
+            
+            addMember();
+        })   
+        .catch(function(err) {
+            console.log(err);
+        });
+}
+ 
+function addMember() {
+    // Prompts user to add a team member
+    promptUser()
+    .then(function(answer) {
+        console.log(answer);
+        if (answer.add == "Yes") {
+            console.log("Yes selected!");
+            // Prompt user of member type
+            promptType()
+            .then(function(answers) {
+                console.log(answers);
+                if (answers.memberType === "Engineer") {
+                    console.log("Engineer selected");
+                    addEngineer();                            
+                } 
+                else if (answers.memberType === "Intern") {
+                    console.log("Intern selected");
+                    addIntern();                            
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+
+        }
+        else {
+            console.log("No selected");
+            // Writes rendered html to output path
+            fs.writeFile(outputPath, render(team), function(err){
+                if(err){
+                    throw err;
+                }
+                console.log("Success rendering of html!");
+            });                    
+        }
+    })
+    .catch(function(err) {
+        console.log(err);
+    });
 }
 
-// adds engineer member to team array
+// Prompt user if adding another team member
+function promptUser() {
+    return inquirer.prompt({
+            type: "list",
+            message: "Would you like to add a member to your team?",
+            name: "add",
+            choices: ["Yes", "No"]
+        });
+}
+
+// Prompt user of member type: Engineer or Intern
+function promptType() {
+    return inquirer.prompt({ 
+        type: "list",
+        message: "Add a member",
+        name: "memberType",
+        choices: ["Engineer", "Intern"]
+    });
+}
+
+// Adds engineer member to team array
 function addEngineer() {
     inquirer
         .prompt([{
@@ -96,12 +129,14 @@ function addEngineer() {
         .then(function(response){
             console.log(response);
             const engineer = new Engineer(response.name, response.id, response.email, response.github);
-            renderManager(engineer);
+
+            console.log(engineer.name);
             team.push(engineer);
             console.log(team);
-            if (team.length < 3) {
-                runInquirer();
-            }
+            addMember();
+        })
+        .catch(function(err) {
+            console.log(err);
         });
 }
 
@@ -129,21 +164,15 @@ function addIntern() {
         .then(function(response){
             console.log(response);
             const intern = new Intern(response.name, response.id, response.email, response.school);
-            renderManager(intern);
+
+            console.log(intern.name);
             team.push(intern);
             console.log(team);
-            if (team.length < 3) {
-                runInquirer();
-            }
+            addMember();
+        })
+        .catch(function(err) {
+            console.log(err);
         });
-}
+}            
 
-// After the user has input all employees desired, call the "render" function (required above) and pass in an array containing all employee objects; the 'render' function will generate and return a block of HTML including templated divs for each employee!
-
-// After you have your html, you're now ready to create an HTML file using the HTML returned from the "render" function. Now write it to a file named "team.html" in the "output" folder. You can use the variable "outputPath" above target this location.
-
-// Hint: you may need to check if the "output" folder exists and create it if it does not.
-
-// Hint: each employee type (manager, engineer or intern) has slightly different information; write your code to ask different questions via inquirer depending on employee type.
-
-// Hint: make sure to build out your classes first! Remember that your Manager, Engineer, and Intern classes should all extend from a class named Employee; see the directions for further information. Be sure to test out each class and verify it generates an object with the correct structure and methods. This structure will be crucial in order for the provided "render" function to work!
+start();
