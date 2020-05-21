@@ -23,7 +23,7 @@ The dependencies are, [jest](https://jestjs.io/) for running the provided tests,
 Run the following commands for execution of application:
  
 ```sh
-node index.js
+node app.js
 ```
 
 * User input
