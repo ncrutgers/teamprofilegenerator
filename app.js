@@ -33,7 +33,7 @@ function start(){
         }
         ])
         .then(function(response) {
-            console.log(response);
+            //console.log(response);
             const manager = new Manager(response.name, response.id, response.email, response.office);
             team.push(manager);
             
@@ -48,13 +48,13 @@ function addMember() {
     // Prompts user to add a team member
     promptUser()
     .then(function(answer) {
-        console.log(answer);
+        //console.log(answer);
         if (answer.add == "Yes") {
             console.log("Yes selected!");
             // Prompt user of member type
             promptType()
             .then(function(answers) {
-                console.log(answers);
+                //console.log(answers);
                 if (answers.memberType === "Engineer") {
                     console.log("Engineer selected");
                     addEngineer();                            
@@ -70,7 +70,7 @@ function addMember() {
 
         }
         else {
-            console.log("No selected");
+            console.log("No selected!.");
             // Writes rendered html to output path
             fs.writeFile(outputPath, render(team), function(err){
                 if(err){
@@ -127,12 +127,12 @@ function addEngineer() {
         }
         ])
         .then(function(response){
-            console.log(response);
+            //console.log(response);
             const engineer = new Engineer(response.name, response.id, response.email, response.github);
 
-            console.log(engineer.name);
+            //console.log(engineer.name);
             team.push(engineer);
-            console.log(team);
+            //console.log(team);
             addMember();
         })
         .catch(function(err) {
@@ -162,12 +162,12 @@ function addIntern() {
         }
         ])
         .then(function(response){
-            console.log(response);
+            //console.log(response);
             const intern = new Intern(response.name, response.id, response.email, response.school);
 
-            console.log(intern.name);
+            //console.log(intern.name);
             team.push(intern);
-            console.log(team);
+            //console.log(team);
             addMember();
         })
         .catch(function(err) {
